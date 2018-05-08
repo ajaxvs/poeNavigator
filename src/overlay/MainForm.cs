@@ -14,12 +14,12 @@ namespace poeNavigator {
 		//================================================================================
 		//WinAPI:
 		[DllImport("user32.dll", SetLastError = true)]
-    	static private extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vlc);
-    	
+		static private extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vlc);
+		
 		[DllImport("user32.dll", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		static private extern bool UnregisterHotKey(IntPtr hWnd, int id);
-    	//=====
+		//=====
 		public enum GWL {
 			ExStyle = -20
 		}
@@ -31,7 +31,7 @@ namespace poeNavigator {
 			ColorKey = 0x1,
 			Alpha = 0x2
 		}
-    	[DllImport("user32.dll", EntryPoint = "GetWindowLong")]
+		[DllImport("user32.dll", EntryPoint = "GetWindowLong")]
 		public static extern int GetWindowLong(IntPtr hWnd, GWL nIndex);
 		
 		[DllImport("user32.dll", EntryPoint = "SetWindowLong")]
@@ -40,34 +40,34 @@ namespace poeNavigator {
 		[DllImport("user32.dll", EntryPoint = "SetLayeredWindowAttributes")]
 		public static extern bool SetLayeredWindowAttributes(IntPtr hWnd, int crKey, byte alpha, LWA dwFlags);
 		//=====
-    	private const int WM_HOTKEY = 0x0312;
-    	private const int WM_NCHITTEST = 0x84; 
-    	private const int HTTRANSPARENT = -1;
-    	private const int switchHotkeyId = 0;
-    	//================================================================================
-    	//dev config:
-    	//overlay: good looking, no input:
-    	private const bool isTransparent = true;
-    	private const bool isPaintBg = false;
-    	private const bool isLimeBg = false;
-    	private const bool isLayerStyle = true;    	
-    	//so.. options:
-    	//1. "Aero" enabled. Everything is ok.
-    	//2. "Aero" disabled:
-    	//2.1. opaque window, handle input, good fps. Bad.
-    	//2.2. transparent window, ignore input, low fps. Very bad.
-    	//================================================================================
-    	//user config:
-    	private const byte minimizeWindowAlpha = 0x80;
-    	private const byte fullWindowAlpha = 0xE0;
-    	private const int noteAddHeight = 5;
-    	private const double imgAspect = 1.778;
-    	//================================================================================
-    	//vars:
-    	private bool isFullMode = false;
-    	private PictureBox[] aPictureBoxes;
-    	private int visiblePictures = 0;
-    	private int registeredHotkey = 0;
+		private const int WM_HOTKEY = 0x0312;
+		private const int WM_NCHITTEST = 0x84; 
+		private const int HTTRANSPARENT = -1;
+		private const int switchHotkeyId = 0;
+		//================================================================================
+		//dev config:
+		//overlay: good looking, no input:
+		private const bool isTransparent = true;
+		private const bool isPaintBg = false;
+		private const bool isLimeBg = false;
+		private const bool isLayerStyle = true;    	
+		//so.. options:
+		//1. "Aero" enabled. Everything is ok.
+		//2. "Aero" disabled:
+		//2.1. opaque window, handle input, good fps. Bad.
+		//2.2. transparent window, ignore input, low fps. Very bad.
+		//================================================================================
+		//user config:
+		private const byte minimizeWindowAlpha = 0x80;
+		private const byte fullWindowAlpha = 0xE0;
+		private const int noteAddHeight = 5;
+		private const double imgAspect = 1.778;
+		//================================================================================
+		//vars:
+		private bool isFullMode = false;
+		private PictureBox[] aPictureBoxes;
+		private int visiblePictures = 0;
+		private int registeredHotkey = 0;
 		//================================================================================
 		public MainForm(CajConfig config) {
 			InitializeComponent();
