@@ -92,7 +92,7 @@ namespace poeNavigator.app
 				dataDir = getAppPath() + "..\\..\\" + dataFolderName; //dev path.
 				if (!System.IO.Directory.Exists(dataDir)) {	
 					appError("Can't find data folder. Did you unzip the archive?" + 
-					                "\n\nUnzip all and launch again.");
+						"\n\nUnzip all and launch again.");
 				}
 			}
 		}
@@ -123,9 +123,9 @@ namespace poeNavigator.app
 		//================================================================================
 		static private void appError(string msg) {
 			MessageBox.Show(msg,
-                appName + " :: Error", 
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error);
+					appName + " :: Error", 
+					MessageBoxButtons.OK,
+					MessageBoxIcon.Error);
 			end();
 		}
 		//================================================================================

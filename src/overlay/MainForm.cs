@@ -152,17 +152,17 @@ namespace poeNavigator {
 				} else {
 					color = Color.Black;
 				}
-      			this.BackColor = color;
-        		this.TransparencyKey = color;
+				this.BackColor = color;
+				this.TransparencyKey = color;
         		
-        		if (isLayerStyle) {
-		    		//destroys permormance without "Aero".
-			    	int wl = GetWindowLong(this.Handle, GWL.ExStyle);
-		    		wl = wl | 0x80000 | 0x20; //WS_EX.Layered | WS_EX.Transparent.
-		    		//wl = wl | 0x20; //disappears after dx render.
-		    		SetWindowLong(this.Handle, GWL.ExStyle, wl);
-		    		setWindowAlpha(minimizeWindowAlpha);
-		    	}
+				if (isLayerStyle) {
+					//destroys permormance without "Aero".
+					int wl = GetWindowLong(this.Handle, GWL.ExStyle);
+					wl = wl | 0x80000 | 0x20; //WS_EX.Layered | WS_EX.Transparent.
+					//wl = wl | 0x20; //disappears after dx render.
+					SetWindowLong(this.Handle, GWL.ExStyle, wl);
+					setWindowAlpha(minimizeWindowAlpha);
+				}
 			} else {
 				this.BackColor = Color.FromArgb(0xFF, 0x21, 0x21, 0x21);
 			}
@@ -208,9 +208,9 @@ namespace poeNavigator {
 		}
 		//================================================================================
 		void MainFormResize(object sender, EventArgs e) {
-		    if (this.WindowState == FormWindowState.Minimized) {
-        		CajApp.trace("minimized");
-    		}			
+			if (this.WindowState == FormWindowState.Minimized) {
+				CajApp.trace("minimized");
+			}
 		}
 		//================================================================================
 		void NotifyIcon1MouseDoubleClick(object sender, MouseEventArgs e) {

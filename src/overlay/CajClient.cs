@@ -68,21 +68,21 @@ namespace poeNavigator.app
 
 				//read last symbols:
 				fs.Seek(lastReadOffset, SeekOrigin.Begin);
-            	byte[] bytes = new byte[bytesLeft];
-            	int numBytesRead = 0;            	
-            	while (bytesLeft > 0) {
-	                int n = fs.Read(bytes, numBytesRead, bytesLeft);
-	                if (n == 0) {
-	                	break;
-	                }
-                	numBytesRead += n;
-                	bytesLeft -= n;
-            	}
-            	lastReadOffset = fsLength;
-            	//fs.Close(); //nn.
+				byte[] bytes = new byte[bytesLeft];
+				int numBytesRead = 0;            	
+				while (bytesLeft > 0) {
+					int n = fs.Read(bytes, numBytesRead, bytesLeft);
+					if (n == 0) {
+						break;
+					}
+					numBytesRead += n;
+					bytesLeft -= n;
+				}
+				lastReadOffset = fsLength;
+				//fs.Close(); //nn.
 				
-            	//get text:
-            	s = Encoding.UTF8.GetString(bytes);
+				//get text:
+				s = Encoding.UTF8.GetString(bytes);
             	
 			} catch (Exception ex) {
 				if (log != null) {
