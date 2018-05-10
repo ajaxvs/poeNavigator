@@ -19,19 +19,44 @@ namespace poeNavigator
 
 			elementTitle = CajApp.appName + " :: Options";
 			this.Text = elementTitle;
-			this.lblStatus.Text = "";
+			fillHotkeyVars();
 			
 			//start vars:
 			this.txtPoeFolder.Text = config.read(CajConfig.poeFolderPath);			
-			this.txtSwitchHotkey.Text = config.read(CajConfig.switchHotkey);	
+			this.cbHotkey.Text = getUserAliasHotkey(config.read(CajConfig.switchHotkey));
 			
-			this.lblStatus.Text = "Don't forget:" +
-				"\n# set \"Aero\" Windows theme." +
-				"\n# Run PoE in \"Windowed Fullscreen\" mode." +
-				"\n# change game part in notify icon menu." +
-				"";
+			this.lblStatus.Text = "Game Part:\ncheck system tray menu."; 
+			//rest text was moved to "About": it takes too much place, bad UX.
 			
 			this.lblLink.Text = "(c) " + CajApp.appAboutLink;
+		}
+		//================================================================================
+		private void fillHotkeyVars() {
+			//using Text. allow user to write any value.
+			//make some examples from Enum.GetValues(typeof(Keys)):
+			//var a = Enum.GetValues(typeof(Keys)); 
+			//foreach (var k in a) CajApp.trace(k.ToString());
+			
+			cbHotkey.Items.Add("None");
+			cbHotkey.Items.Add("Tilde"); //oemtilde.
+			cbHotkey.Items.Add("Capital");
+			cbHotkey.Items.Add("Space");
+			cbHotkey.Items.Add("PageUp");
+			cbHotkey.Items.Add("PageDown");
+			cbHotkey.Items.Add("End");
+			cbHotkey.Items.Add("Home");
+			cbHotkey.Items.Add("Insert");
+			cbHotkey.Items.Add("Delete");
+
+			for (int i = 0; i <= 12; i++) {
+				cbHotkey.Items.Add("F" + i.ToString());
+			}
+			for (int i = 0; i <= 9; i++) {
+				cbHotkey.Items.Add("NumPad" + i.ToString());
+			}
+			for (char i = 'A'; i <= 'Z'; i++) {
+				cbHotkey.Items.Add(i);
+			}
 		}
 		//================================================================================
 		void AboutToolStripMenuItemClick(object sender, EventArgs e) {
@@ -53,7 +78,24 @@ namespace poeNavigator
 		}
 		//================================================================================
 		public void showSafe() {
-			this.Show();
+			this.Show(); //enough atm.
+		}
+		//================================================================================
+		public void onFirstLaunch() {
+			string poeFolder = CajFuns.findPoeFolder();
+			if (poeFolder != "") {
+				txtPoeFolder.Text = poeFolder;
+				CajApp.onOptionsChange(poeFolder, cbHotkey.Text);
+			}
+			txtPoeFolder.Focus(); //select it, so user can notice and correct it.
+		}
+		//================================================================================
+		private string getUserAliasHotkey(string realHotkey) {
+			string s = realHotkey;
+			if (realHotkey == "Oemtilde") {
+				s = "Tilde";
+			}
+			return s;
 		}
 		//================================================================================
 		void ButSaveClick(object sender, EventArgs e) {			
@@ -63,8 +105,13 @@ namespace poeNavigator
 				sErr = "Can't find PoE folder.";
 			}
 			
-			//TODO: hotkeys listbox or check keydown event or something else. atm = temp method.
-			string sHotkey = txtSwitchHotkey.Text.Trim();
+			string sHotkey = cbHotkey.Text.Trim();
+			if (sHotkey == "None") {
+				sHotkey = "";
+			}
+			if (sHotkey == "Tilde") {
+				sHotkey = "Oemtilde";
+			}
 			if (sHotkey != "") {
 				bool isOkHotkey = true;
 				try {

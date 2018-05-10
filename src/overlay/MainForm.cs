@@ -68,6 +68,7 @@ namespace poeNavigator {
 		private PictureBox[] aPictureBoxes;
 		private int visiblePictures = 0;
 		private int registeredHotkey = 0;
+		private string lastRegisteredHotkey = "";
 		//================================================================================
 		public MainForm(CajConfig config) {
 			InitializeComponent();
@@ -105,43 +106,44 @@ namespace poeNavigator {
 				aPictureBoxes[i] = pic;
 			}
 		}		
-		//================================================================================
-		/**
-		 * @param switchHotkey - Keys value. i.e. "Capital" for CapsLock.
-		 * //TODO: change hotkey param to int.
-		 * */
-		private void createHotkey(string switchHotkey) {
+		//================================================================================		
+		public void createHotkey(string switchHotkey) {
 			//RegisterHotKey() notes:
 			//prevents key press in current target app.
 			//doesn't work if PoE was run by admin and this app wasn't.
-			//anyway GetAsyncKeyState() doesn't work here and hooks aren't good idea as well.
-			//TODO: UnregisterHotKey on hide or fix GetAsyncKeyState (?). 
-			//TODO: notice user to run as admin if needed (?).
+			//requires windows handle.
 
+			removeHotkey();
+			
 			if (switchHotkey == "") return;
-
-			//switch mode hotkey:			
 			try {
 				registeredHotkey = (int)Enum.Parse(typeof(Keys), switchHotkey);	
 				if (registeredHotkey > 0) {
 					bool isOk = RegisterHotKey(this.Handle, switchHotkeyId, 0, registeredHotkey);
+					lastRegisteredHotkey = switchHotkey;
 					CajApp.trace("hotkey set: " + registeredHotkey.ToString() + " " +
 				             ((Keys)registeredHotkey).ToString() + ", " + isOk.ToString());
 				} else {
 					CajApp.trace("no hotkey: " + registeredHotkey.ToString() + " " + switchHotkey);
 				}
 			} catch (Exception ex) {
-				CajApp.trace("exception hotkey (" + switchHotkey + "): " + ex.Message);
-				return;
-			}	
+				CajApp.trace("createHotkey hotkey (" + switchHotkey + ") ex: " + ex.Message);				
+			}
 		}
 		//================================================================================
-		public void changeHotkey(string newHotkey) {			
-			//reset anyway, even if newHotkey == old:
-			if (registeredHotkey != 0) {				
+		public void removeHotkey() {
+			if (registeredHotkey == 0) return;
+			
+			try {
 				UnregisterHotKey(this.Handle, switchHotkeyId);
+			} catch (Exception ex) {
+				CajApp.trace("removeHotkey hotkey ex: " + ex.Message);
 			}
-			createHotkey(newHotkey);
+		}
+		//================================================================================
+		public void changeHotkey(string newHotkey) {
+			//don't create yet.
+			lastRegisteredHotkey = newHotkey;
 		}
 		//================================================================================
 		private void setOverlayTheme() {
@@ -210,6 +212,7 @@ namespace poeNavigator {
 		void MainFormResize(object sender, EventArgs e) {
 			if (this.WindowState == FormWindowState.Minimized) {
 				CajApp.trace("minimized");
+				//removeHotkey(); //no.
 			}
 		}
 		//================================================================================
@@ -234,16 +237,19 @@ namespace poeNavigator {
 		//================================================================================
 		void ToolStripMenuItem1Click(object sender, EventArgs e) {			
 			CajApp.showByNotifyOption(true);
+			createHotkey(lastRegisteredHotkey);
 			onFull();
 		}
 		//================================================================================
 		void ToolStripMenuItem2Click(object sender, EventArgs e) {			
 			CajApp.showByNotifyOption(true);
+			createHotkey(lastRegisteredHotkey);
 			onMin();
 		}
 		//================================================================================
 		void ToolStripMenuItem3Click(object sender, EventArgs e) {			
 			CajApp.showByNotifyOption(false);
+			removeHotkey();
 			onHide();
 		}
 		//================================================================================
@@ -271,10 +277,8 @@ namespace poeNavigator {
 			this.Top = (Screen.PrimaryScreen.Bounds.Height - this.Height) / 2;
 			setWindowAlpha(fullWindowAlpha);
 			
-			lblNotes.Visible = true;
-			this.Visible = true;
-			correntForm();
-			this.Show();			
+			lblNotes.Visible = true;			
+			correctForm();
 		}
 		//================================================================================
 		private void onMin() {
@@ -293,9 +297,7 @@ namespace poeNavigator {
 			setWindowAlpha(minimizeWindowAlpha);
 			
 			lblNotes.Visible = false;			
-			this.Visible = true;			
-			correntForm();
-			this.Show();
+			correctForm();
 			
 			//CajApp.trace("min img size: " + minimizeImageWidth.ToString() + " " +
 			//	minimizeImageHeight.ToString());
@@ -358,7 +360,7 @@ namespace poeNavigator {
 			//this.Width.ToString() + " " + this.Height.ToString());
 		}
 		//================================================================================
-		private void correntForm() {
+		private void correctForm() {
 			if (!isFullMode && visiblePictures == 0) {
 				int tinyHeight;
 				if (this.lblNotes.Text != "") {
@@ -368,6 +370,8 @@ namespace poeNavigator {
 				}
 				this.Height = tinyHeight;
 			}
+			this.Visible = true;
+			this.Show(); //can be overridden, so call it too.
 		}
 		//================================================================================
 		private void onHide() {
@@ -379,8 +383,10 @@ namespace poeNavigator {
 			Invoke(new Action(() => {
 			                  	if (show) {
 			                  		this.Show();
+			                  		createHotkey(lastRegisteredHotkey);
 			                  	} else {
 			                  		this.Hide();
+			                  		removeHotkey();
 			                  	}
 			}));
 		}

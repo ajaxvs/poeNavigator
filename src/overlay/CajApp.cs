@@ -8,24 +8,23 @@ using System.Diagnostics;
 using System.Text;
 using System.Timers;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
 
 namespace poeNavigator.app
 {
 	public class CajApp {
 		//================================================================================
-		[DllImport("user32.dll")]
-		static extern IntPtr GetForegroundWindow();
-
-		[DllImport("user32.dll")]
-		static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
-		//================================================================================
 		public const string appName = "poeNavigator";
-		public const string appAbout = "Authors:" + 
-			"\n\nOriginal guide: Engineering Eternity" +
-			"\nNotes: _treb" +
-			"\nSoftware development: AjaxVS" + 
-			"\n\nv.0.0.1";
+		public const string appAbout = "This app shows last entered location layouts & tips." +
+			"\nUse it for navigation & faster leveling." + //atm.
+			"\n(White: entrance. Green: exit and main path. Blue: waypoint. Grey: optional area)" +
+			"\n\nRequires:" +
+			"\n# Aero Windows theme." +
+			"\n# English PoE in \"Windowed Fullscreen\" mode." +
+			"\n\nAuthors:" +
+			"\n# original guide: Engineering Eternity" +
+			"\n# notes: _treB" +
+			"\n# software development: AjaxVS" + 
+			"\n\nv.180510";
 		public const string appAboutLink = "https://ajaxvs.github.io/poenavigator.html";
 		//================================================================================
 		private const string dataFolderName = "data/";
@@ -48,7 +47,7 @@ namespace poeNavigator.app
 		static private bool hiddenByForegroundCheck = false;
 		static private bool hiddenByNotifyOption = false;
 		//================================================================================
-		public CajApp() {}
+		public CajApp() {} //nn singleton
 		//================================================================================
 		static public MainForm start() {
 			//data:
@@ -69,6 +68,7 @@ namespace poeNavigator.app
 			//first launch:
 			if (poeFolder == "") {
 				showOptions();
+				optionsForm.onFirstLaunch();
 			}
 			
 			//launch main timer:
@@ -87,9 +87,10 @@ namespace poeNavigator.app
 		//================================================================================
 		static private void validateDirs() {
 			//dataDir:
-			dataDir = getAppPath() + dataFolderName;
+			string appPath = CajFuns.getAppPath();
+			dataDir = appPath + dataFolderName;
 			if (!System.IO.Directory.Exists(dataDir)) {
-				dataDir = getAppPath() + "..\\..\\" + dataFolderName; //dev path.
+				dataDir = appPath + "..\\..\\" + dataFolderName; //dev path.
 				if (!System.IO.Directory.Exists(dataDir)) {	
 					appError("Can't find data folder. Did you unzip the archive?" + 
 						"\n\nUnzip all and launch again.");
@@ -106,21 +107,6 @@ namespace poeNavigator.app
 			Debug.WriteLine(msg);
 		}
 		//================================================================================
-		static private string getAppPath() {
-			return System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location) + "\\";
-		}
-		//================================================================================
-		static private string getForegroundWindowTitle() {
-			const int size = 1024;
-			StringBuilder sb = new StringBuilder(size);
-			IntPtr h = GetForegroundWindow();			
-			string ret = "";
-			if (GetWindowText(h, sb, size) > 0) {
-				ret = sb.ToString();
-			}
-			return ret;
-		}
-		//================================================================================
 		static private void appError(string msg) {
 			MessageBox.Show(msg,
 					appName + " :: Error", 
@@ -131,8 +117,8 @@ namespace poeNavigator.app
 		//================================================================================
 		static public void end() {
 			//need improvement:
-			optionsForm.Close();
-			mainForm.Close();
+			if (optionsForm != null) optionsForm.Close();
+			if (mainForm != null) mainForm.Close();
 			if (System.Windows.Forms.Application.MessageLoop) {
 				System.Windows.Forms.Application.Exit();
 			} else {
@@ -162,7 +148,7 @@ namespace poeNavigator.app
 			if (!hideOnPoeBackground) return;
 			
 			//hide overlay if PoE window isn't on front:
-			string s = getForegroundWindowTitle();
+			string s = CajFuns.getForegroundWindowTitle();
 			if (s == poeWindowTitle || s == appName) {
 				if (hiddenByForegroundCheck) {
 					trace("foreground show");
@@ -179,7 +165,7 @@ namespace poeNavigator.app
 		}
 		//================================================================================
 		static public void showOptions() {
-			optionsForm.showSafe(); //enough atm.
+			optionsForm.showSafe();
 		}
 		//================================================================================
 		static public void onOptionsChange(string poeFolderPath, string switchHotkey) {
