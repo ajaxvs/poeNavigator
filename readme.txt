@@ -1,3 +1,3 @@
 poeNavigator
 
-https://ajaxvs.github.io/poenavigator.html
+http://ajaxvs.eu.org/?t=poenavigator
